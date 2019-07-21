@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Input, Message, Container, Header } from 'semantic-ui-react'
+import { Button, Input, Message, Container, Header } from 'semantic-ui-react';
 import { graphql } from 'react-apollo';
 import { gql } from 'apollo-boost';
 import CustomError from '../error';
@@ -64,21 +64,23 @@ class Register extends Component {
     if (passwordError) errorList.push(passwordError);
     return (
       <Container text>
-        <Header as='h2'>Register</Header>
+        <Header as="h2">Register</Header>
         <Input
           error={!!usernameError}
           name="username"
           onChange={this.onChange}
           value={username}
           placeholder="Username"
-          fluid />
+          fluid 
+        />
         <Input
           error={!!emailError}
           name="email"
           onChange={this.onChange}
           value={email}
           placeholder="Email"
-          fluid />
+          fluid 
+        />
         <Input
           error={!!passwordError}
           name="password"
@@ -86,7 +88,8 @@ class Register extends Component {
           type="password"
           value={password}
           placeholder="Password"
-          fluid />
+          fluid 
+        />
         <Button onClick={this.onSubmit}>Submit</Button>
         {(usernameError || emailError || passwordError) && (
           <Message 
