@@ -8,35 +8,29 @@ import { graphql } from 'react-apollo';
 import { gql } from 'apollo-boost';
 import CustomError from '../utils/error';
 
-class Login extends Component {
+class CreateTeam extends Component {
   constructor(props) {
     super(props);
 
     extendObservable(this, {
-      email: '',
-      password: '',
+      name: '',
       errors: {},
     });
   }
 
   // eslint-disable-next-line consistent-return
   onSubmit = async () => {
-    const { email, password } = this;
+    const { name } = this;
     const { mutate, history } = this.props;
-
+    let response = null;
     try {
-      const response = await mutate({
-        variables: { email, password },
+      response = await mutate({
+        variables: { name },
       });
-
-      const {
-        ok, token, refreshToken, errors,
-      } = response.data.login;
+      const { ok, errors } = response.data.createTeam;
 
       if (ok) {
-        localStorage.setItem('token', token);
-        localStorage.setItem('refreshToken', refreshToken);
-        return history.push('/create-team');
+        return history.push('/');
       }
       throw new CustomError(errors, 'validation failed');
     } catch (error) {
@@ -46,6 +40,8 @@ class Login extends Component {
           err[`${path}Error`] = message;
         });
         this.errors = err;
+      } else {
+        history.push('/login');
       }
     }
   }
@@ -56,35 +52,22 @@ class Login extends Component {
   }
 
   render() {
-    const { email, password, errors: { emailError, passwordError } } = this;
+    const { name, errors: { nameError } } = this;
 
     const errorList = [];
 
-    if (emailError) errorList.push(emailError);
-    if (passwordError) errorList.push(passwordError);
+    if (nameError) errorList.push(nameError);
     return (
       <Container text>
-        <Header as="h2">Login</Header>
+        <Header as="h2">Create A Team</Header>
 
         <Form>
-          <Form.Field error={!!emailError}>
+          <Form.Field error={!!nameError}>
             <Input
-              type="email"
-              name="email"
+              name="name"
               onChange={this.onChange}
-              value={email}
-              placeholder="Email"
-              fluid
-            />
-          </Form.Field>
-
-          <Form.Field error={!!passwordError}>
-            <Input
-              name="password"
-              onChange={this.onChange}
-              type="password"
-              value={password}
-              placeholder="Password"
+              value={name}
+              placeholder="Name"
               fluid
             />
           </Form.Field>
@@ -104,12 +87,10 @@ class Login extends Component {
   }
 }
 
-const loginMutation = gql`
-  mutation($email: String!, $password: String!) {
-    login(email: $email, password: $password){
+const createTeamMutation = gql`
+  mutation($name: String!) {
+    createTeam(name: $name){
       ok
-      token
-      refreshToken
       errors {
         path
         message
@@ -118,4 +99,4 @@ const loginMutation = gql`
   }
 `;
 
-export default graphql(loginMutation)(observer(Login));
+export default graphql(createTeamMutation)(observer(CreateTeam));

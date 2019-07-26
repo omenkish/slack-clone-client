@@ -4,7 +4,7 @@ import {
 } from 'semantic-ui-react';
 import { graphql } from 'react-apollo';
 import { gql } from 'apollo-boost';
-import CustomError from '../error';
+import CustomError from '../utils/error';
 
 class Register extends Component {
   state = {
