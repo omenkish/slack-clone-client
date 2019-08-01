@@ -27,10 +27,10 @@ class CreateTeam extends Component {
       response = await mutate({
         variables: { name },
       });
-      const { ok, errors } = response.data.createTeam;
+      const { ok, errors, team } = response.data.createTeam;
 
       if (ok) {
-        return history.push('/');
+        return history.push(`view-team/${team.id}`);
       }
       throw new CustomError(errors, 'validation failed');
     } catch (error) {
@@ -91,6 +91,9 @@ const createTeamMutation = gql`
   mutation($name: String!) {
     createTeam(name: $name){
       ok
+      team {
+        id
+      }
       errors {
         path
         message

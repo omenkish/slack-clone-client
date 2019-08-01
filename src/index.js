@@ -22,15 +22,14 @@ const authLink = setContext((_, { headers }) => {
   return {
     headers: {
       ...headers,
-      'x-token': token || '',
-      'x-refresh-token': refreshToken || '',
+      'x-token': token,
+      'x-refresh-token': refreshToken,
     },
   };
 });
 
-const afterwareLink = new ApolloLink((operation, forward) => forward(operation).map((response) => {
-  const context = operation.getContext();
-  const { response: { headers } } = context;
+const afterwareLink = new ApolloLink((operation, forward) => {
+  const { headers } = operation.getContext();
 
   if (headers) {
     const token = headers.get('x-token');
@@ -43,10 +42,12 @@ const afterwareLink = new ApolloLink((operation, forward) => forward(operation).
       localStorage.setItem('refreshToken', refreshToken);
     }
   }
-  return response;
-}));
+  return forward(operation);
+});
+
+const link = afterwareLink.concat(authLink.concat(httpLink));
 const client = new ApolloClient({
-  link: authLink.concat(httpLink) || afterwareLink.concat(httpLink),
+  link,
   cache: new InMemoryCache(),
 });
 
