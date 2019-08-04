@@ -1,0 +1,47 @@
+import React from 'react';
+import { graphql } from 'react-apollo';
+import { gql } from 'apollo-boost';
+import { Comment } from 'semantic-ui-react';
+import Messages from '../components/Messages';
+
+const MessageContainer = ({ data: { loading, messages } }) => (
+  (loading ? null : (
+    <Messages>
+      <Comment.Group>
+        { !!messages && messages.map(m => (
+          <Comment>
+            <Comment.Content>
+              <Comment.Author as="a">{m.user.username}</Comment.Author>
+              <Comment.Metadata>
+                <div>{m.createdAt}</div>
+              </Comment.Metadata>
+              <Comment.Text>{m.text}</Comment.Text>
+              <Comment.Actions>
+                <Comment.Action>Reply</Comment.Action>
+              </Comment.Actions>
+            </Comment.Content>
+          </Comment>
+        ))}
+      </Comment.Group>
+    </Messages>
+  ))
+
+);
+
+const messagesQuery = gql`
+  query($channelId: ID!) {
+    messages(channelId: $channelId) {
+      id
+      text
+      createdAt
+      user {
+        username
+      }
+    }
+  }
+`;
+export default graphql(messagesQuery, {
+  variables: props => ({
+    channelId: props.channelId,
+  }),
+})(MessageContainer);
