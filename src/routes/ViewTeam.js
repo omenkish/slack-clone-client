@@ -7,16 +7,17 @@ import SendMessage from '../components/SendMessage';
 import AppLayout from '../components/AppLayout';
 import Sidebar from '../containers/Sidebar';
 import MessageContainer from '../containers/MessageContainer';
-import { allTeamsQuery } from '../graphql/team';
+import { meQuery } from '../graphql/team';
 
 const ViewTeam = (
-  { data: { loading, allTeams, inviteTeams }, match: { params: { teamId, channelId } } },
+  { data: { loading, me }, match: { params: { teamId, channelId } } },
 ) => {
   if (loading) return null;
 
-  const teams = allTeams.concat(
-    inviteTeams.filter(s => !allTeams.find(t => t.id === s.id)), // end filter
-  );
+  const { teams, username } = me;
+  // const teams = allTeams.concat(
+  //   inviteTeams.filter(s => !allTeams.find(t => t.id === s.id)), // end filter
+  // );
   // const teams = [...allTeams, ...inviteTeams];
   if (!teams.length) {
     return (<Redirect to="/create-team" />);
@@ -34,6 +35,7 @@ const ViewTeam = (
           letter: t.name.charAt(0).toUpperCase(),
         }))}
         team={team}
+        username={username}
       />
       {channel && <Header channelName={channel.name} />}
       {channel && <MessageContainer channelId={channel.id} />}
@@ -42,4 +44,8 @@ const ViewTeam = (
   );
 };
 
-export default graphql(allTeamsQuery)(ViewTeam);
+export default graphql(meQuery, {
+  options: {
+    fetchPolicy: 'network-only',
+  },
+})(ViewTeam);

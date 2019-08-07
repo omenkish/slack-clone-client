@@ -6,7 +6,7 @@ import {
 import { withFormik } from 'formik';
 import { compose, graphql } from 'react-apollo';
 import { gql } from 'apollo-boost';
-import { allTeamsQuery } from '../graphql/team';
+import { meQuery } from '../graphql/team';
 
 const AddChannelModal = ({
   open,
@@ -79,12 +79,12 @@ export default compose(
           const { ok, channel } = createChannel;
           if (!ok) return;
           // Read the data from our cache for this query
-          const data = store.readQuery({ query: allTeamsQuery });
-          const teamIdx = findIndex(data.allTeams, ['id', teamId]);
+          const data = store.readQuery({ query: meQuery });
+          const teamIdx = findIndex(data.me.teams, ['id', teamId]);
           // Add our comment from the mutation to the end
-          data.allTeams[teamIdx].channels.push(channel);
+          data.me.teams[teamIdx].channels.push(channel);
           // Write our data back to the cache
-          store.writeQuery({ query: allTeamsQuery, data });
+          store.writeQuery({ query: meQuery, data });
         },
       });
       close();

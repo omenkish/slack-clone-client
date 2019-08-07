@@ -56,9 +56,8 @@ export default ({
   channels,
   users,
   onAddChannelClick,
-  team: { id: teamId, name: teamName },
+  team: { id: teamId, name: teamName, admin: isOwner },
   onInvitePeopleClick,
-  isOwner,
 }) => (
   <ChannelWrapper>
     <PushLeft>

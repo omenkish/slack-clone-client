@@ -51,13 +51,11 @@ export default compose(
     handleSubmit: async (values, { props: { channelId, mutate }, resetForm, setSubmitting }) => {
       if (!values.message || !values.message.trim()) {
         setSubmitting(false);
-        console.log('empty');
         return;
       }
       await mutate({
         variables: { channelId, text: values.message },
       });
-      console.log('Not empty');
       resetForm(false);
     },
   }),

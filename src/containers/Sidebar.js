@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import Channels from '../components/Channels';
 import Teams from '../components/Teams';
-import authenticate from '../utils/authentication';
 import AddChannelModal from '../components/AddChannelModal';
 import InvitePeopleModal from '../components/InvitePeopleModal';
 
@@ -22,11 +21,8 @@ export default class Sidebar extends Component {
   }
 
   render() {
-    const { teams, team } = this.props;
+    const { teams, team, username } = this.props;
     const { openAddChannelModal, openInvitePeopleModal } = this.state;
-
-    const authUser = authenticate();
-    const isOwner = authUser.id === team.owner;
 
     return [
       <Teams
@@ -35,8 +31,7 @@ export default class Sidebar extends Component {
       />,
       <Channels
         key="channels-sidebar"
-        isOwner={isOwner}
-        username={authUser.username}
+        username={username}
         team={team}
         channels={team.channels}
         users={[{ id: 1, name: 'slackbot' }, { id: 2, name: 'User1' }]}
