@@ -7,31 +7,25 @@ import Header from '../components/Header';
 import SendMessage from '../components/SendMessage';
 import AppLayout from '../components/AppLayout';
 import Sidebar from '../containers/Sidebar';
-import MessageContainer from '../containers/MessageContainer';
+import DirectMessageContainer from '../containers/DirectMessageContainer';
 import { meQuery } from '../graphql/team';
 
-const ViewTeam = (
+const DirectMessages = (
   {
     mutate,
     data: { loading, me },
-    match: { params: { teamId, channelId } },
+    match: { params: { teamId, userId } },
   },
 ) => {
   if (loading) return null;
-
   const { teams, username } = me;
-  // const teams = allTeams.concat(
-  //   inviteTeams.filter(s => !allTeams.find(t => t.id === s.id)), // end filter
-  // );
-  // const teams = [...allTeams, ...inviteTeams];
   if (!teams.length) {
     return (<Redirect to="/create-team" />);
   }
 
   const teamIndex = teamId ? findIndex(teams, ['id', teamId]) : 0;
   const team = teamIndex === -1 ? teams[0] : teams[teamIndex];
-  const channelIndex = channelId ? findIndex(team.channels, ['id', channelId]) : 0;
-  const channel = channelIndex === -1 ? team.channels[0] : team.channels[channelIndex];
+
   return (
     <AppLayout>
       <Sidebar
@@ -42,27 +36,31 @@ const ViewTeam = (
         team={team}
         username={username}
       />
-      {channel && <Header channelName={channel.name} />}
-      {channel && <MessageContainer channelId={channel.id} />}
-      {channel && (
-        <SendMessage
-          placeholder={channel.name}
-          onSubmit={async (text) => {
-            await mutate({ variables: { text, channelId: channel.id } });
-          }}
-        />
-      )}
+      <Header channelName="Someone's username" />
+      <DirectMessageContainer teamId={teamId} userId={userId} />
+      <SendMessage
+        onSubmit={async (text) => {
+          const response = await mutate({
+            variables: {
+              text,
+              receiverId: userId,
+              teamId,
+            },
+          });
+          console.log('response :', response);
+        }}
+        placeholder={userId}
+      />
     </AppLayout>
   );
 };
 
-const createMessageMutation = gql`
-  mutation($channelId: ID!, $text: String!) {
-    createMessage(channelId: $channelId, text: $text)
+const createDirectMessageMutation = gql`
+  mutation($receiverId: ID!, $text: String!, $teamId: ID!) {
+    createDirectMessage(receiverId: $receiverId, text: $text, teamId: $teamId)
   }
 `;
-
 export default compose(
   graphql(meQuery, { options: { fetchPolicy: 'network-only' } }),
-  graphql(createMessageMutation),
-)(ViewTeam);
+  graphql(createDirectMessageMutation),
+)(DirectMessages);
